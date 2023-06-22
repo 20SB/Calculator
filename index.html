@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Calculator</title>
+    <style>
+      .calculator {
+        width: 40%;
+        min-width: 400px;
+        background-color: rgb(226, 224, 224);
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        margin: auto;
+        font-weight: bold;
+      }
+      .calculator h2 {
+        margin: 0 0 10px 0;
+        padding: 10px;
+        text-align: center;
+        background-color: black;
+        color: wheat;
+      }
+
+      .result {
+        font-size: 20px;
+        text-align: right;
+        margin-bottom: 10px;
+        height: 50px;
+        line-height: 30px;
+        overflow: hidden;
+        white-space: nowrap;
+        background-color: white;
+      }
+
+      .button-row {
+        display: flex;
+        /* justify-content: space-between; */
+      }
+
+      .button {
+        width: 25%;
+        height: 40px;
+        background-color: #e6e6e6;
+        border: 1px solid #ccc;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button:hover {
+        background-color: rgb(255, 200, 119);
+      }
+      .op {
+        background-color: rgb(193, 68, 68);
+        color: white;
+      }
+      .op:hover {
+        background-color: rgb(67, 41, 1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <h2>CALCULATOR</h2>
+      <div class="result" id="result"></div>
+      <div class="button-row">
+        <div class="button" onclick="clearResult()">C</div>
+        <div class="button" onclick="toggleNegation()">+/-</div>
+        <div class="button" onclick="appendSymbol('%')">%</div>
+        <div class="button op" onclick="appendSymbol('/')">/</div>
+      </div>
+      <div class="button-row">
+        <div class="button" onclick="appendNumber('7')">7</div>
+        <div class="button" onclick="appendNumber('8')">8</div>
+        <div class="button" onclick="appendNumber('9')">9</div>
+        <div class="button op" onclick="appendSymbol('*')">*</div>
+      </div>
+      <div class="button-row">
+        <div class="button" onclick="appendNumber('4')">4</div>
+        <div class="button" onclick="appendNumber('5')">5</div>
+        <div class="button" onclick="appendNumber('6')">6</div>
+        <div class="button op" onclick="appendSymbol('-')">-</div>
+      </div>
+      <div class="button-row">
+        <div class="button" onclick="appendNumber('1')">1</div>
+        <div class="button" onclick="appendNumber('2')">2</div>
+        <div class="button" onclick="appendNumber('3')">3</div>
+        <div class="button op" onclick="appendSymbol('+')">+</div>
+      </div>
+      <div class="button-row">
+        <div class="button" onclick="appendNumber('0')" style="width: 50%;">
+          0
+        </div>
+        <div class="button" onclick="appendDecimal('.')">.</div>
+        <div class="button op" onclick="calculateResult()">=</div>
+      </div>
+    </div>
+
+    <script>
+      const resultElement = document.getElementById("result");
+      let negation = false;
+      var newNo ="";
+      function appendNumber(value) {
+        resultElement.textContent += value;
+        newNo += value;
+      }
+
+      function appendSymbol(symbol) {
+        resultElement.textContent += " " + symbol + " ";
+        newNo="";
+      }
+      
+      function appendDecimal(decimal) {
+        // Prevent adding multiple decimals
+        if (!newNo.includes(decimal)) {
+          resultElement.textContent += decimal;
+          newNo += decimal;
+        }
+      }
+
+      function clearResult() {
+        resultElement.textContent = "";
+        newNo="";
+      }
+
+      function toggleNegation() {
+        negation = !negation;
+        resultElement.textContent = negation
+          ? "-" + resultElement.textContent
+          : resultElement.textContent.slice(1);
+      }
+
+      function calculateResult() {
+        let expression = resultElement.textContent;
+        console.log(expression);
+        expression = expression.replace(/ /g, ""); // Remove spaces
+        // console.log(expression);
+
+        // Handle negation
+        expression = expression.replace(/--/g, "+");
+        expression = expression.replace(/-(\d+)/g, "-$1");
+
+        // Handle percentage
+        expression = expression.replace(/(\d+)%/g, "($1/100)");
+
+        try {
+          const result = eval(expression);
+          // console.log(result);
+          resultElement.textContent = result;
+        } catch (error) {
+          resultElement.textContent = "Error";
+        }
+      }
+
+      document.addEventListener("keydown", function (event) {
+        const key = event.key;
+        console.log(key);
+
+        if (/[0-9+\-*/.%]/.test(key)) {
+          event.preventDefault();
+
+          if (key === ".") {
+            appendDecimal(key);
+          } else if (key === "%") {
+            appendSymbol(key);
+          } else {
+            appendNumber(key);
+          }
+        } else if (key === "=" || key === "Enter") {
+          event.preventDefault();
+          calculateResult();
+        } else if (key === "Escape") {
+          event.preventDefault();
+          clearResult();
+        }
+      });
+    </script>
+  </body>
+</html>
